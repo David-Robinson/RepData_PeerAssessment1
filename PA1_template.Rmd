@@ -1,25 +1,47 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# **Loading and preprocessing the data**
 
+## Load the data
 
-## Loading and preprocessing the data
+```{r, echo = TRUE}
+activity_data <- read.csv("activity.csv")
+```
 
+## Process/transform the data (if necessary) into a format suitable for your analysis
 
+```{r, echo = TRUE}
+activity_data$date <- as.Date(activity_data$date, "%m/%d/%Y")
+str(activity_data)
+head(activity_data)
+```
 
-## What is mean total number of steps taken per day?
+# **What is mean total number of steps taken per day?**
 
+## Calculate the total number of steps taken per day
 
+```{r, echo = TRUE}
+StepsPerDay <- aggregate(steps ~ date, data = activity_data, sum, na.rm = TRUE)
+str(StepsPerDay)
+head(StepsPerDay)
+```
 
-## What is the average daily activity pattern?
+## Make histogram of the total number of steps taken each day
 
+```{r, echo = TRUE}
+library(ggplot2)
+p <- qplot(x = date, y = steps, data = StepsPerDay, geom = "histogram", 
+        stat = "identity")
+p + labs(title = "Total Steps Per Day", x = "Day", y = "Steps")
+```
 
+## Calculate and report the mean and median of the total number of steps taken per day
 
-## Imputing missing values
+### Mean steps per day:
+```{r, echo = TRUE}
+round(mean(StepsPerDay$steps))
+```
 
+### Median steps per day:
+```{r, echo = TRUE}
+round(median(StepsPerDay$steps))
+```
 
-
-## Are there differences in activity patterns between weekdays and weekends?
