@@ -24,7 +24,7 @@ str(StepsPerDay)
 head(StepsPerDay)
 ```
 
-## Make histogram of the total number of steps taken each day
+## Make a histogram of the total number of steps taken each day
 
 ```{r, echo = TRUE}
 library(ggplot2)
@@ -45,3 +45,78 @@ round(mean(StepsPerDay$steps))
 round(median(StepsPerDay$steps))
 ```
 
+# **What is the average daily activity pattern?**
+
+## Make a time series plot of the 5-minute interval and the average number
+## of steps taken, averaged across all days
+
+```{r, echo = TRUE}
+time_series <- aggregate(steps ~ interval, data = activity_data, mean, na.rm = TRUE)
+plot(time_series$interval, time_series$steps,
+        type = "l",
+        col = "blue",
+        main = "Average Steps Taken Per 5-minute Interval Across All Days",
+        xlab = "5-minute Interval",
+        ylab = "Average Number of Steps Taken")
+```
+
+## Which 5-minute interval, on average across all the days in the dataset,
+## contains the maximum number of steps?
+
+```{r, echo = TRUE}
+max_interval_steps <- which.max(time_series$steps)
+time_series[max_interval_steps, ]
+```
+
+# **Imputing Missing Values**
+
+## Calculate and report the total number of missing values in the dataset (i.e. NA's)
+
+```{r, echo = TRUE}
+activity_data_NA <- sum(is.na(activity_data))
+activity_data_NA
+```
+
+## Devise a strategy for filling in all of the missing values in the dataset
+## (strategy is to replace NA's with the mean for that 5-minute interval)
+
+```{r, echo = TRUE}
+new_data_fill <- activity_data
+for(i in 1:nrow(new_data_fill)){
+        if(is.na(new_data_fill$steps[i])){
+                corresponding_interval <- new_data_fill$interval[i]
+                time_series_row <- which(time_series$interval == corresponding_interval)
+                new_steps <- time_series$steps[time_series_row]
+                new_data_fill$steps[i] <- new_steps
+        }
+}
+```
+
+## Create a new dataset that is equal to the original dataset, but with the missing
+## data filled in
+
+```{r, echo = TRUE}
+head(new_data_fill)
+tail(new_data_fill)
+```
+
+## Make a histogram of the total number of steps taken each day, and calculate and
+## report the mean and medial total number of steps taken per day
+
+```{r, echo = TRUE}
+New_StepsPerDay <- aggregate(steps ~ date, data = new_data_fill, sum, na.rm = TRUE)
+str(New_StepsPerDay)
+head(New_StepsPerDay)
+
+p2 <- qplot(x = date, y = steps, data = New_StepsPerDay, geom = "histogram", 
+           stat = "identity")
+p2 + labs(title = "Total Steps Per Day", x = "Day", y = "Steps")
+
+round(mean(New_StepsPerDay$steps))
+round(median(New_StepsPerDay$steps))
+```
+
+### Do these values differ from the estimates from the first part of the assignment?
+
+### What is the impact of imputing missing data on the estimates of the total daily
+### number of steps?
