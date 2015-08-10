@@ -143,5 +143,6 @@ new_time_series <- aggregate(steps ~ category + interval,
 qplot(interval, steps, data = new_time_series, geom = "line",
         xlab = "Interval",
         ylab = "Number of steps") +
-        facet_wrap(~ category, ncol = 1)
+        facet_wrap(~ category, ncol = 1) +
+        theme_bw()
 ```
